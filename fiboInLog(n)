@@ -2,7 +2,7 @@
 using namespace std;
 
 typedef long long ll;
-const int MOD = 1e9+7; // Optional if you want to take mod
+const int MOD = 1e9+7; 
 
 void multiply(ll F[2][2], ll M[2][2]) {
     ll x = (F[0][0]*M[0][0] + F[0][1]*M[1][0]);
