@@ -1,0 +1,51 @@
+#include <iostream>
+using namespace std;
+
+int fen[100005];
+int n;
+
+int sum(int ind) {
+    int s = 0;
+    while (ind > 0) {
+        s += fen[ind];
+        ind -= ind & -ind;
+    }
+    return s;
+}
+
+void update(int ind, int val) {
+    while (ind <= n) {
+        fen[ind] += val;
+        ind += ind & -ind;
+    }
+}
+
+void fenwickTree() {
+    cin >> n;
+    int a[n + 1];
+    for (int i = 1; i <= n; i++) {
+        cin >> a[i];
+        update(i, a[i]);
+    }
+
+    int q;
+    cin >> q;
+    while (q--) {
+        int type;
+        cin >> type;
+        if (type == 1) {
+            int ind, val;
+            cin >> ind >> val;
+            update(ind, val);
+        } else {
+            int l, r;
+            cin >> l >> r;
+            cout << sum(r) - sum(l - 1) << endl;
+        }
+    }
+}
+
+int main() {
+    fenwickTree();
+    return 0;
+}
