@@ -1,0 +1,91 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <map>
+using namespace std;
+
+class FenwickTree {
+public:
+    FenwickTree(int size) {
+        n = size;
+        tree.resize(n + 2, 0);
+    }
+
+    void update(int index, int delta) {
+        while (index <= n) {
+            tree[index] += delta;
+            index += index & -index;
+        }
+    }
+
+    int query(int index) {
+        int sum = 0;
+        while (index > 0) {
+            sum += tree[index];
+            index -= index & -index;
+        }
+        return sum;
+    }
+
+private:
+    int n;
+    vector<int> tree;
+};
+
+long long tripInvCount(int n, vector<int>& arr) {
+    // Step 1: Coordinate compression
+    vector<int> sorted = arr;
+    sort(sorted.begin(), sorted.end());
+    map<int, int> compressed;
+
+    int idx = 1;
+    for (int val : sorted) {
+        if (!compressed.count(val)) {
+            compressed[val] = idx++;
+        }
+    }
+
+    // Replace elements with compressed values
+    for (int i = 0; i < n; ++i) {
+        arr[i] = compressed[arr[i]];
+    }
+
+    // Fenwick trees
+    FenwickTree fenwickLeft(n);
+    FenwickTree fenwickRight(n);
+
+    // Step 2: Initialize right tree with all elements
+    for (int i = 0; i < n; ++i) {
+        fenwickRight.update(arr[i], 1);
+    }
+
+    long long triplets = 0;
+    for (int i = 0; i < n; ++i) {
+        // Remove current from right
+        fenwickRight.update(arr[i], -1);
+
+        int leftCount = fenwickLeft.query(n) - fenwickLeft.query(arr[i]);
+        int rightCount = fenwickRight.query(arr[i] - 1);
+
+        triplets += (long long)leftCount * rightCount;
+
+        // Add current to left
+        fenwickLeft.update(arr[i], 1);
+    }
+
+    return triplets;
+}
+
+int main() {
+    int n;
+    cin >> n;
+    vector<int> arr(n);
+
+    for (int i = 0; i < n; ++i) {
+        cin >> arr[i];
+    }
+
+    cout << tripInvCount(n, arr) << endl;
+
+    return 0;
+}
